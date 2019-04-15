@@ -54,8 +54,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   bool validateAndSave () {
-    var _keyState = _formKey.currentState;
-    if (_keyState.validate()){
+    var _formState = _formKey.currentState;
+    if (_formState.validate()){
+      _formState.save();
       return true;
     }
     else return false;
@@ -63,11 +64,15 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateAndSubmit () async {
     if (validateAndSave()){
-      FirebaseUser _user = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _email,
-          password: _password)
-          .then((_) {Navigator.of(context).pushNamed("/main_page");})
-          .catchError((e) {debugPrint("ERROR MESSAGE: $e");});
+      try {
+        FirebaseUser _user = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+            email: _email,
+            password: _password);
+        debugPrint("SIGN IN. USER ID: ${_user.uid}");
+      }catch (e){
+        debugPrint("GRESKA! GRESKA! ERROR MESSAGE: $e");
+      }
     }
     debugPrint("NIJE VALIDNO");
   }
@@ -86,15 +91,8 @@ class _LoginPageState extends State<LoginPage> {
             ? (String value) => validateEmail(value)
             : (String value) => validatePassword(value),
         onSaved: text == "email adress"
-            ? (String value) {
-          setState(() {
-            _email = value;
-          });
-        } : (String value) {
-          setState(() {
-            _password = value;
-          });
-        },
+            ?  (String value) {_email = value;}
+            : (String value) {_password = value;},
       ),
     );
   }

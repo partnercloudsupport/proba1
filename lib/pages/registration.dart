@@ -35,8 +35,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   bool validateAndSave () {
-    var _state = _formkey.currentState;
-    if (_state.validate()){
+    var _fmState = _formkey.currentState;
+    if (_fmState.validate()){
+      _fmState.save();
       return true;
     }
     else return false;
@@ -44,14 +45,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   void validateAndSubmit () async {
     if (validateAndSave()) {
-      FirebaseUser _fbUser = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password)
-          .then((_) {
-          Navigator.of(context).pop();
-          Navigator.of(context).pushNamed("/main_page");
-      })
-          .catchError((e) {debugPrint("ERROR MESSAGE: $e");});
+      try {
+        FirebaseUser _fbUser = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+            email: email,
+            password: password);
+        debugPrint("NEW USER REGISTERED. USER ID: ${_fbUser.uid}");
+      } catch (e){
+        debugPrint("GRESKA! GRESKA! ERROR MESSAGE: $e");
+      }
     }
     debugPrint("NIJE VALIDNO");
   }
@@ -113,16 +115,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
             else
               return null;
           },
-          onSaved: text == "first name" ?
-              (String value) {
-            setState(() {
-              firstName = value;
-            });}
-              :
-              (String value) {
-            setState(() {
-              lastName = value;
-            });}
+          onSaved: text == "first name"
+              ? (String value) {firstName = value;}
+              : (String value) {lastName = value;}
       ),
     );
   }
