@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import './pages/login.dart';
 import './pages/registration.dart';
 import './pages/main_page/main_screen.dart';
+import './services/userManagement.dart';
 
 void main () => runApp(Challenger());
 
@@ -19,7 +20,7 @@ class Challenger extends StatelessWidget {
         home: LoginPage(),
         routes: <String, WidgetBuilder> {
           "/login" : (BuildContext context) => LoginPage(),
-          "/registration" : (BuildContext context) => RegistrationPage(),
+          "/registration" : (BuildContext context) => RegistrationPage(user: UserManagement(),),
           "/main_page" : (BuildContext context) => MainScreen()
         }
     );

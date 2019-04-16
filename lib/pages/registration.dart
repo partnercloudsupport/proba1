@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../services/userManagement.dart';
 import 'dart:async';
 
 class RegistrationPage extends StatefulWidget {
+
+  RegistrationPage({Key key, this.user}) : super(key: key);
+
+  UserManagement user;
+
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
@@ -10,10 +16,10 @@ class RegistrationPage extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage> {
 
   var _formkey = GlobalKey<FormState>();
-  String firstName;
-  String lastName;
-  String email;
-  String password;
+  /*String _firstName;
+  String _lastName;
+  String _password;
+  String _email;*/
 
   String validateEmail(String value) {
     Pattern pattern =
@@ -28,7 +34,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   String validatePassword (String value) {
-    if (value.length < 4)
+    if (value.length <= 6)
       return "Password too short";
     else
       return null;
@@ -45,17 +51,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   void validateAndSubmit () async {
     if (validateAndSave()) {
-      try {
-        FirebaseUser _fbUser = await FirebaseAuth.instance
+       await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
-            email: email,
-            password: password);
-        debugPrint("NEW USER REGISTERED. USER ID: ${_fbUser.uid}");
-      } catch (e){
-        debugPrint("GRESKA! GRESKA! ERROR MESSAGE: $e");
+            email: widget.user.email,
+            password: widget.user.password)
+           .then((_fbUser) {
+             widget.user.uid = _fbUser.uid;
+         /*debugPrint("NEW USER REGISTERED. USER ID: ${_fbUser.uid} \n "
+             "USER NAME: $_firstName $_lastName "
+             "USER EMAIL: $_email");*/
+         UserManagement().addNewUser(widget.user, context);
+       })
+           .catchError((e) {
+         debugPrint("GRESKA! GRESKA! ERROR MESSAGE: $e");
+       });
       }
-    }
-    debugPrint("NIJE VALIDNO");
+    else debugPrint("NIJE VALIDNO");
   }
 
 
@@ -85,9 +96,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    formName("fisrt name"),
+                    formName("first name"),
                     formName("last name"),
-                    //formBirthYearField(),
+                    formUsername(),
                     emailAndPass("email adress"),
                     emailAndPass("password"),
                     registrationButton()
@@ -96,7 +107,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
             ),
           ),
-
         ),
       ),
     );
@@ -116,8 +126,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
               return null;
           },
           onSaved: text == "first name"
-              ? (String value) {firstName = value;}
-              : (String value) {lastName = value;}
+              ? (String value) { setState(() {
+            widget.user.firstName = value;
+              });}
+              : (String value) { setState(() {
+            widget.user.lastName = value;
+              });},
       ),
     );
   }
@@ -135,30 +149,33 @@ class _RegistrationPageState extends State<RegistrationPage> {
             (String value) => validatePassword(value),
         onSaved: text == "email adress" ? (String value) {
           setState(() {
-            email = value;
+            widget.user.email = value;
           });
         } : (String value) {
           setState(() {
-            password = value;
+            widget.user.password = value;
           });
         },
       ),
     );
   }
 
-  Widget formBirthYearField () {
+  Widget formUsername () {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
-        keyboardType: TextInputType.number,
         decoration: InputDecoration(
-          labelText: "Enter your birth year",
+          labelText: "Enter your username",
         ),
         validator: (String value) {
           if (value.isEmpty)
-            return "Invalid birth year";
-          else
-            return null;
+            return "Requires at least one character";
+          else return null;
+        },
+        onSaved: (value) {
+          setState(() {
+            widget.user.username = value;
+          });
         },
       ),
     );

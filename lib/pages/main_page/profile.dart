@@ -17,7 +17,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           showUserInfo("first name", 200.0),
           showUserInfo("last name", 250.0),
           showUserInfo("date of birth",300.0),
-          showUserInfo("city", 350.0),
+          showUserInfo("email", 350.0),
           showUserInfo("something else", 400.0)
         ]
     );

@@ -64,17 +64,19 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateAndSubmit () async {
     if (validateAndSave()){
-      try {
-        FirebaseUser _user = await FirebaseAuth.instance
+      await FirebaseAuth.instance
             .signInWithEmailAndPassword(
             email: _email,
-            password: _password);
+            password: _password)
+          .then((_user) {
         debugPrint("SIGN IN. USER ID: ${_user.uid}");
-      }catch (e){
+        Navigator.of(context).pushNamed("/main_page");
+      })
+          .catchError((e) {
         debugPrint("GRESKA! GRESKA! ERROR MESSAGE: $e");
+      });
       }
-    }
-    debugPrint("NIJE VALIDNO");
+    else debugPrint("NIJE VALIDNO");
   }
 
   Widget textFormField (String text) {
@@ -91,8 +93,12 @@ class _LoginPageState extends State<LoginPage> {
             ? (String value) => validateEmail(value)
             : (String value) => validatePassword(value),
         onSaved: text == "email adress"
-            ?  (String value) {_email = value;}
-            : (String value) {_password = value;},
+            ?  (String value) {setState(() {
+                _email = value;
+            });}
+            : (String value) {setState(() {
+                _password = value;
+            });},
       ),
     );
   }
@@ -115,6 +121,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget regButton () {
     return FlatButton(
       onPressed: () {
+        _formKey.currentState.reset();
         Navigator.of(context).pushNamed("/registration");
       },
       child: Text("Don't have an account? Create new!",
