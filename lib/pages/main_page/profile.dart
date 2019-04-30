@@ -1,4 +1,10 @@
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:proba/services/userManagement.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -6,110 +12,178 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
+  var image = "lib/images/default_picture.png";
+  File newProfileImage;
+  bool _picFlag = false;
+
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-        children: <Widget>[
-          getImage("lib/images/profilna_slika.jpg"),
-          showUser(),
-          userRating(),
-          userRatingInfo(),
-          showUserInfo("first name", 200.0),
-          showUserInfo("last name", 250.0),
-          showUserInfo("date of birth",300.0),
-          showUserInfo("email", 350.0),
-          showUserInfo("something else", 400.0)
-        ]
+    return ScopedModelDescendant<UserManagement>(
+        builder: (BuildContext context, Widget child, UserManagement model) {
+          return Scaffold(
+            body: Center(
+              child: SingleChildScrollView(
+                child: Center(
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                          children: <Widget>[
+                            _picFlag ? _progressIndicator : getImage(image),
+                            showUser(model),
+                          ]
+                      ),
+                      changePicButton(),
+                      Container(
+                          alignment: Alignment.bottomRight,
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Text("User info")
+                      ),
+                      Divider(color: Theme.of(context).primaryColor,indent: 80.0),
+                      showUserInfo("${model.firstName} ${model.lastName}", Icons.account_circle),
+                      showUserInfo("${model.birthDate}", Icons.date_range),
+                      showUserInfo("${model.email}", Icons.email),
+                      showUserInfo("Total number of challenges", Icons.assignment_turned_in)
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+    );
+  }
+
+
+  void imageIsUploading () {
+    setState(() {
+      _picFlag = true;
+    });
+}
+
+void imageDoneUpload () {
+    setState(() {
+      _picFlag = false;
+    });
+}
+
+
+
+  Widget _progressIndicator () {
+    return Container(
+      alignment: Alignment.center,
+      child: CircularProgressIndicator(
+        strokeWidth: 4.0,
+      ),
+    );
+  }
+
+  uploadImage () async {
+    var tempImage = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      newProfileImage = tempImage;
+      imageIsUploading();
+    });
+
+    if (_picFlag == true){
+      FirebaseAuth.instance.currentUser()
+          .then((user) {
+        final StorageReference _fireBaseStorageRef = FirebaseStorage.instance.ref().child(
+            "Profile_pictures/${user.uid.toString()}.jpg");
+
+        StorageUploadTask task = _fireBaseStorageRef.putFile(newProfileImage);
+
+        task.onComplete
+            .then((value) {
+          UserManagement().updateProfileImage(value.toString());
+          setState(() {
+            image = user.photoUrl;
+          });
+          imageDoneUpload();
+        })
+            .catchError((e) {
+          imageDoneUpload();
+          debugPrint("ERROR MESSAGE: $e");
+        });
+          })
+          .catchError((e) {
+            imageDoneUpload();
+            print("ERROR MESSAGE: $e");
+          });
+
+    }
+  }
+
+  Widget changePicButton () {
+    return Container(
+      alignment: Alignment.topLeft,
+      child: FlatButton(
+          onPressed: uploadImage,
+          child: Icon(Icons.edit),
+      ),
     );
   }
 
   Widget getImage (String imageUrl) {
     AssetImage assetImage = AssetImage(imageUrl);
-    Image image = Image(image: assetImage, height: 140.0, width: 1400.0,fit: BoxFit.fill);
-    return Positioned(
-      top: 6.0,
-      left: 6.0,
-      child: CircleAvatar(
-        child: ClipOval(
-            child: image
-        ),
-        radius: 70.0,
-      ),
-    );
-  }
-
-  Widget showUser () {
-    return Positioned(
-      top: 20.0,
-      left: 160.0,
-      child: Column(
-        children: <Widget>[
-          Text(
-            "Username",
-            style: TextStyle(
-                fontSize: 26.0
+    Image image = Image(image: assetImage, height: 140.0, width: 140.0,fit: BoxFit.fill);
+    return  Padding(
+        padding: EdgeInsets.only(top:8.0, left: 14.0, bottom: 8.0),
+        child: CircleAvatar(
+            child: ClipOval(
+                child: image
             ),
-          ),
-          Text("Full name"),
-        ],
+            radius: 70.0,
+
       ),
     );
   }
 
-  Widget showUserInfo (String text, double pos) {
-    return Positioned(
-      top: pos,
-      left: 2.0,
-      right: 2.0,
-      child: Column(
+  Widget showUser (UserManagement model) {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(right: 38.0),
+        child: Column(
+                children: <Widget>[
+                  Text(
+                    model.username ?? "",
+                    style: TextStyle(
+                        fontSize: 23.0
+                    ),
+                  ),
+                  Text("${model.firstName ?? ""} ${model.lastName ?? ""}"),
+                ],
+        ),
+      ),
+    );
+  }
+
+  Widget showUserInfo (String text, IconData icon) {
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text("User: $text",style: TextStyle(fontSize: 25.0),
-            ),
-          ),
-        ],
-      ),
-    );
+            child: ListTile(
+                  title: Text(text),
+                  leading: Icon(icon),
+                )
+              ),
+          ],
+      );
   }
 
   Widget userRating() {
-    return Positioned(
-        top: 105.0,
-        right: 20.0,
-        child: Row(
-            children: <Widget>[
-              Padding(
-                  padding: EdgeInsets.only(right: 62.0),
-                  child: Icon(Icons.grade,size: 40.0,)
-              ),
-              Padding(
-                  padding: EdgeInsets.only(right: 48.0),
-                  child: Icon(Icons.confirmation_number,size: 40.0,)
-              ),
-            ]
-        )
-    );
-  }
-
-  Widget userRatingInfo () {
-    return Positioned(
-        top: 165.0,
-        right: 20.0,
-        child: Row(
-            children: <Widget>[
-              Padding(
-                  padding: EdgeInsets.only(right: 38.0),
-                  child: Text("Rating")
-              ),
-              Padding(
-                  padding: EdgeInsets.only(right: 15.0),
-                  child: Text("Total challenges")
-              ),
-            ]
-        )
+    return Padding(
+      padding: EdgeInsets.only(right: 8.0),
+      child: Row(
+              children: <Widget>[
+                  Text("Total number of challenges"),
+                  Icon(Icons.assignment_turned_in,size: 40.0,),
+              ]
+      ),
     );
   }
 }

@@ -9,9 +9,24 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  String _email;
-  String _password;
+
   var _formKey = GlobalKey<FormState>();
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+  var _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _loading = false;
+
+  _isLoading () {
+    setState(() {
+      _loading = true;
+    });
+  }
+
+  _loggedIn () {
+    setState(() {
+      _loading = false;
+    });
+  }
 
 
 
@@ -33,46 +48,46 @@ class _LoginPageState extends State<LoginPage> {
     else return null;
   }
 
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Form(
-        key: _formKey,
-        child: ListView(
-            children: <Widget>[
-              getImage("lib/images/challenge.jpg"),
-              textFormField("email addres"),
-              textFormField("password"),
-              loginButton(),
-              regButton(),
-              Divider(height: 80.0)
-            ]
-        ),
-      ),
-    );
+  dispose(){
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
   }
+
 
   bool validateAndSave () {
     var _formState = _formKey.currentState;
     if (_formState.validate()){
       _formState.save();
+      _isLoading();
       return true;
     }
     else return false;
   }
+  
+  _showSnackBar (String errorText) {
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+          duration: Duration(seconds: 4),
+          content: Text(errorText)
+      )
+    );
+  }
 
-  void validateAndSubmit () async {
+  Future<void> validateAndSubmit () async {
     if (validateAndSave()){
       await FirebaseAuth.instance
             .signInWithEmailAndPassword(
-            email: _email,
-            password: _password)
+            email: _email.text,
+            password: _password.text)
           .then((_user) {
-        debugPrint("SIGN IN. USER ID: ${_user.uid}");
-        Navigator.of(context).pushNamed("/main_page");
-      })
+            _loggedIn();
+            Navigator.of(context).pushNamed("/main_page");
+          })
           .catchError((e) {
+        _showSnackBar(e.toString());
+        _loggedIn();
         debugPrint("GRESKA! GRESKA! ERROR MESSAGE: $e");
       });
       }
@@ -83,22 +98,16 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: EdgeInsets.all(5.0),
       child: TextFormField(
+        controller: text == "password" ? _password : _email,
         obscureText: text == "password" ? true : false,
         decoration: InputDecoration(
             labelText: "Enter your $text",
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)
             )
         ),
-        validator: text == "email adress"
-            ? (String value) => validateEmail(value)
-            : (String value) => validatePassword(value),
-        onSaved: text == "email adress"
-            ?  (String value) {setState(() {
-                _email = value;
-            });}
-            : (String value) {setState(() {
-                _password = value;
-            });},
+        validator: text == "password"
+            ? (String value) => validatePassword(value)
+            : (String value) => validateEmail(value),
       ),
     );
   }
@@ -121,7 +130,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget regButton () {
     return FlatButton(
       onPressed: () {
-        _formKey.currentState.reset();
         Navigator.of(context).pushNamed("/registration");
       },
       child: Text("Don't have an account? Create new!",
@@ -136,6 +144,36 @@ class _LoginPageState extends State<LoginPage> {
     AssetImage assetImage = AssetImage(imageUrl);
     Image image = Image(image: assetImage, height: 250.0, width: 250.0,);
     return Container(child: image);
+  }
+
+  Widget _progressIndicator () {
+    return Container(
+      alignment: Alignment.center,
+      child: CircularProgressIndicator(
+        strokeWidth: 4.0,
+      ),
+    );
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+            children: <Widget>[
+              getImage("lib/images/challenge.jpg"),
+              textFormField("email addres"),
+              textFormField("password"),
+              _loading ? _progressIndicator() : loginButton(),
+              regButton(),
+              Divider(height: 80.0)
+            ]
+        ),
+      ),
+    );
   }
 }
 
