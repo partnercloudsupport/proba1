@@ -30,6 +30,29 @@ class UserManagement extends Model with NewChallenge {
     return user;
   }
 
+  Future getChallenges() async {
+    List<NewChallenge> array = new List();
+    await FirebaseAuth.instance.currentUser().then((_currentUser) {
+      Firestore.instance
+          .collection("Users")
+          .where("uid", isEqualTo: _currentUser.uid)
+          .getDocuments()
+          .then((QuerySnapshot docs) {
+        if (docs.documents.isNotEmpty) {
+          var userData;
+          userData = docs.documents[0].data;
+
+          notifyListeners();
+        }
+      }).catchError((e) {
+        debugPrint("ERROR MESSAGE 1: $e");
+      });
+    }).catchError((e) {
+      debugPrint("ERROR MESSAGE 2: $e");
+    });
+    return array;
+  }
+
   //upis podataka novog user u bazu
   Future addNewUser(user) async {
     await Firestore.instance.collection("Users").add({
@@ -40,9 +63,7 @@ class UserManagement extends Model with NewChallenge {
       'username': user.username,
       'photo_url': user.photoUrl,
       'birth_date': user.birthDate,
-      'challenges': [
-        {'name': "", 'description': "", 'duration': "", 'image': ""}
-      ]
+      'challenges': []
     }).catchError((e) {
       debugPrint("ERROR MESSAGE: $e");
     });
@@ -89,18 +110,16 @@ class UserManagement extends Model with NewChallenge {
           .where("uid", isEqualTo: user.uid)
           .getDocuments()
           .then((docs) {
+        var tempOutput = new List<dynamic>.from(docs.documents[0].data["challenges"]);
+        tempOutput.add({
+          'name': details.name,
+          'description': details.description,
+          'duration': details.duration,
+          //'image' : imageUrl
+        });
         Firestore.instance
             .document("Users/${docs.documents[0].documentID}")
-            .setData({
-          'challenges': [
-            {
-              'name': details.name,
-              'description': details.description,
-              'duration': details.duration,
-              //'image' : imageUrl
-            }
-          ]
-        }, merge: true);
+            .setData({"challenges": tempOutput}, merge: true);
       }).then((_) {
         print("USPELO!!!");
       }).catchError((e) {
@@ -139,7 +158,6 @@ class UserManagement extends Model with NewChallenge {
 
   Future updateUserInfo(TextEditingController firstName,
       TextEditingController lastName, String birth) async {
-
     await FirebaseAuth.instance.currentUser().then((user) {
       Firestore.instance
           .collection("Users")
@@ -164,5 +182,4 @@ class UserManagement extends Model with NewChallenge {
       print("ERROR MESSAGE 3: $e");
     });
   }
-
 }

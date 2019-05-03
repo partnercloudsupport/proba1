@@ -36,33 +36,35 @@ class _FeedState extends State<Feed> {
   Widget cardBuilder (snapshot) {
     return Padding(
       padding: EdgeInsets.all(8.0),
-      child: Card(
-        child: Column(
-          children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("username"),
-              ],
-            ),
-            Container(
-              alignment: Alignment.center,
-              color: Colors.blue,
-              width: 350.0,
-              height: 300.0,
-              child: Text("IMAGE"),
-            ),
-            ExpansionTile(
-              title: Text("Name of the challenge"),
-              trailing: Icon(Icons.keyboard_arrow_down),
-              children: <Widget>[
-                ListTile(
-                  title: Text("Duration"),
-                  subtitle: Text("Description of the challenge"),
-                )
-              ],
-            )
-          ],
+      child: SingleChildScrollView(
+        child: Card(
+          child: Column(
+            children: <Widget>[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text("username"),
+                ],
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                width: 350.0,
+                height: 300.0,
+                child: Text("IMAGE"),
+              ),
+              ExpansionTile(
+                title: Text("Name of the challenge"),
+                trailing: Icon(Icons.keyboard_arrow_down),
+                children: <Widget>[
+                  ListTile(
+                    title: Text("Duration"),
+                    subtitle: Text("Description of the challenge"),
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
