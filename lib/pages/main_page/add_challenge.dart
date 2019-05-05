@@ -145,7 +145,9 @@ class _AddChallengeState extends State<AddChallenge> {
     ImageSource.gallery,
     );
     setState(() {
-      _image = image;
+      if (image != null){
+        _image = image;
+      }
     });
   }
 
