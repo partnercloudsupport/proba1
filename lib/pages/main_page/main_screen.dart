@@ -5,6 +5,8 @@ import './add_challenge.dart' as add;
 import './feed.dart' as feed;
 import 'package:proba/services/userManagement.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/all_challenges_storage.dart';
+import 'package:proba/services/new_challenge.dart';
 
 class MainScreen extends StatefulWidget {
 
@@ -50,8 +52,8 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
             body: TabBarView(
                 controller: _tabController,
                 children: <Widget>[
-                  add.AddChallenge(user: widget.user),
-                  feed.Feed(),
+                  add.AddChallenge(challengeDetails: NewChallenge(),),
+                  feed.Feed(storage: AllChallengesStorage(),),
                   profile.ProfileScreen()
                 ]
             ),

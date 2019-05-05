@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import './new_challenge.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class UserManagement extends Model with NewChallenge {
+class UserManagement extends Model {
   String firstName;
   String lastName;
   String username;
@@ -12,6 +11,8 @@ class UserManagement extends Model with NewChallenge {
   String email;
   String photoUrl;
   String birthDate;
+  int totalChallenges;
+
 
   UserManagement(
       {this.firstName,
@@ -20,18 +21,19 @@ class UserManagement extends Model with NewChallenge {
       this.uid,
       this.email,
       this.photoUrl,
-      this.birthDate});
+      this.birthDate,
+      this.totalChallenges});
 
-  //daje trenutnog user
-  Future<String> giveCurrentUserUid() {
+  //daje uid trenutnog user
+  /*Future<String> giveCurrentUserUid() {
     var user = FirebaseAuth.instance.currentUser().then((_currentUser) {
       return _currentUser.uid;
     });
     return user;
-  }
+  }*/
 
   //upis podataka novog user u bazu
-  Future addNewUser(user) async {
+  Future addNewUser(UserManagement user) async {
     await Firestore.instance.collection("Users").add({
       'email': user.email,
       'uid': user.uid,
@@ -40,20 +42,18 @@ class UserManagement extends Model with NewChallenge {
       'username': user.username,
       'photo_url': user.photoUrl,
       'birth_date': user.birthDate,
-      'challenges': [
-        {'name': "", 'description': "", 'duration': "", 'image': ""}
-      ]
-    }).catchError((e) {
-      debugPrint("ERROR MESSAGE: $e");
+      'total_challenges': user.totalChallenges,
+      'challenges': []
+    }).catchError((e) {print("ERROR MESSAGE: $e");
     });
   }
 
   //upis url-a nove slike u bazu trenutnog usera
-  Future updateProfileImage(String picUrl) {
+  updateProfileImage(String picUrl) async {
     var userInfo = UserUpdateInfo();
     userInfo.photoUrl = picUrl;
 
-    FirebaseAuth.instance.currentUser().then((_currentUser) {
+    await FirebaseAuth.instance.currentUser().then((_currentUser) {
       _currentUser.updateProfile(userInfo).then((value) {
         Firestore.instance
             .collection("Users")
@@ -78,38 +78,6 @@ class UserManagement extends Model with NewChallenge {
     });
   }
 
-  //dodaje novi challenge u bazu trenutnog usera
-  addNewChallenge(
-    UserManagement details,
-    /*String imageUrl*/
-  ) {
-    FirebaseAuth.instance.currentUser().then((user) {
-      Firestore.instance
-          .collection("Users")
-          .where("uid", isEqualTo: user.uid)
-          .getDocuments()
-          .then((docs) {
-        Firestore.instance
-            .document("Users/${docs.documents[0].documentID}")
-            .setData({
-          'challenges': [
-            {
-              'name': details.name,
-              'description': details.description,
-              'duration': details.duration,
-              //'image' : imageUrl
-            }
-          ]
-        }, merge: true);
-      }).then((_) {
-        print("USPELO!!!");
-      }).catchError((e) {
-        print("ERROR MESSAGE 1: $e");
-      });
-    }).catchError((e) {
-      print("ERROR MESSAGE 2: $e");
-    });
-  }
 
   addToModel(UserManagement model) async {
     await FirebaseAuth.instance.currentUser().then((_currentUser) {
@@ -127,6 +95,8 @@ class UserManagement extends Model with NewChallenge {
           model.email = userData["email"];
           model.birthDate = userData["birth_date"];
           model.uid = userData["uid"];
+          model.photoUrl = userData["photo_url"];
+          model.totalChallenges = userData["total_challenges"];
           notifyListeners();
         }
       }).catchError((e) {
@@ -137,8 +107,37 @@ class UserManagement extends Model with NewChallenge {
     });
   }
 
-  Future updateUserInfo(TextEditingController firstName,
-      TextEditingController lastName, String birth) async {
+
+  updateTotalChallengesNumber () async {
+    await FirebaseAuth.instance.currentUser()
+        .then((user) {
+          Firestore.instance.collection("Users")
+              .where("uid", isEqualTo: user.uid)
+              .getDocuments()
+              .then((query) {
+                Firestore
+                    .instance
+                    .document("Users/${query.documents[0].documentID}")
+                    .updateData({
+                'total_challenges' : query.documents[0].data['total_challenges'] + 1
+                })
+                    .then((_) {
+                      print("USPELO!!!!!!!!!!!!!!");
+                })
+                    .catchError((e) {
+                      print("ERROR MESSAGE 1: $e");
+                    });
+          })
+              .catchError((e) {
+                print("ERROR MESSAGE 2: $e");
+              });
+    })
+        .catchError((e) {
+          print("ERROR MESSAGE 3: $e");
+        });
+  }
+
+  updateUserInfo(String firstName, String lastName, String birth) async {
 
     await FirebaseAuth.instance.currentUser().then((user) {
       Firestore.instance
@@ -149,8 +148,8 @@ class UserManagement extends Model with NewChallenge {
         Firestore.instance
             .document("Users/${docs.documents[0].documentID}")
             .updateData({
-          'first_name': firstName.text,
-          'last_name': lastName.text,
+          'first_name': firstName,
+          'last_name': lastName,
           'birth_date': birth,
         }).then((val) {
           print("USPELO!!!!!");

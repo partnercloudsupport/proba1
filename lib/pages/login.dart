@@ -169,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
               textFormField("password"),
               _loading ? _progressIndicator() : loginButton(),
               regButton(),
-              Divider(height: 80.0)
+              SizedBox(height: 40.0)
             ]
         ),
       ),

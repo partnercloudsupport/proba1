@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:proba/services/userManagement.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:proba/services/new_challenge.dart';
 
 class AddChallenge extends StatefulWidget {
 
-  AddChallenge({Key key, this.user}) : super (key: key);
-  UserManagement user;
+  AddChallenge({Key key, this.challengeDetails}) : super (key: key);
+  NewChallenge challengeDetails;
 
   @override
   _AddChallengeState createState() => _AddChallengeState();
@@ -75,11 +75,11 @@ class _AddChallengeState extends State<AddChallenge> {
   }
 
   Future<String> uploadImage (File pic) {
-    var userUid = widget.user.giveCurrentUserUid();
+    var userUid = widget.challengeDetails.giveCurrentUserUid();
     final StorageReference _fireBaseStorageRef = FirebaseStorage
         .instance
         .ref()
-        .child("Challenge_pictures/${widget.user.name}$userUid");
+        .child("Challenge_pictures/${widget.challengeDetails.name}$userUid");
     StorageUploadTask task = _fireBaseStorageRef.putFile(pic);
     var imageUrl = task.onComplete.then((value) {return value.toString();});
     return imageUrl;
@@ -88,13 +88,13 @@ class _AddChallengeState extends State<AddChallenge> {
   //upisuje podatke novog challenge u bazu trenutnog usera
   validateAndSubmit () async {
     if (validateAndSave()){
-      widget.user.name = _challengeName.text;
-      widget.user.description = _challengeDescription.text;
-      widget.user.duration = currentDurationSelected;
+      widget.challengeDetails.name = _challengeName.text;
+      widget.challengeDetails.description = _challengeDescription.text;
+      widget.challengeDetails.duration = currentDurationSelected;
       //widget.user.image = _image;
       //String url = await uploadImage(widget.user.image);
 
-      UserManagement().addNewChallenge(widget.user, /*url*/);
+      await NewChallenge().addNewChallenge(widget.challengeDetails, /*url*/);
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proba/services/userManagement.dart';
+import 'dart:io';
 
 class EditProfile extends StatefulWidget {
   @override
@@ -13,73 +14,77 @@ class _EditProfileState extends State<EditProfile> {
   String _dateFormat = "2/1/1998";
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
+  var defaultImage = "lib/images/default_image.png";
+  File newProfileImage;
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        Navigator.of(context).pop();
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Go back",textAlign: TextAlign.left,),
-          elevation: 0.0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
+        return WillPopScope(
+            onWillPop: () {
               Navigator.of(context).pop();
             },
-          ),
-        ),
-        key: _key,
-        body: Center(
-          child: SingleChildScrollView(
-            child: Center(
-              child: Form(
-                key: _globalKey,
-                child: Column(
-                  children: <Widget>[
-                    newInfo("first name"),
-                    newInfo("last name"),
-                    showBirthDate(context),
-                    updateButton(context)
-                  ],
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text(
+                  "Go back",
+                  textAlign: TextAlign.left,
+                ),
+                elevation: 0.0,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+              key: _key,
+              body: Center(
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: Form(
+                      key: _globalKey,
+                      child: Column(
+                        children: <Widget>[
+                          newInfo("first name"),
+                          newInfo("last name"),
+                          showBirthDate(context),
+                          updateButton(context)
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
+        );
+      }
 
-  _showSnackBar (String errorText) {
+
+  _showSnackBar(String text) {
     _key.currentState.showSnackBar(
-        SnackBar(
-            duration: Duration(seconds: 4),
-            content: Text(errorText)
-        )
-    );
+        SnackBar(duration: Duration(seconds: 4), content: Text(text)));
   }
 
-  bool validateAndSave () {
-    var _fmState = _globalKey.currentState;
-    if (_fmState.validate()){
-      _fmState.save();
+  bool validateAndSave() {
+    var _formState = _globalKey.currentState;
+    if (_formState.validate()) {
+      _formState.save();
       return true;
-    }
-    else return false;
+    } else
+      return false;
   }
 
-  Future validateAndSubmit () async {
-    if (validateAndSave()){
-      UserManagement()
-          .updateUserInfo(_newFirstName, _newLastName, _dateFormat)
-          .then((val) {_showSnackBar("Profile updated!");})
-          .catchError((e) {_showSnackBar(e);});
+  validateAndSubmit() async {
+    if (validateAndSave()) {
+      await UserManagement()
+          .updateUserInfo(_newFirstName.text, _newLastName.text, _dateFormat)
+          .then((val) {
+        _showSnackBar("Profile updated!");
+      }).catchError((e) {
+        _showSnackBar(e);
+      });
     }
   }
-
 
   Widget showBirthDate(BuildContext context) {
     return Row(
@@ -98,9 +103,7 @@ class _EditProfileState extends State<EditProfile> {
         ),
         Expanded(
             child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text(_dateFormat)
-        )),
+                padding: EdgeInsets.all(8.0), child: Text(_dateFormat))),
       ],
     );
   }
@@ -109,9 +112,8 @@ class _EditProfileState extends State<EditProfile> {
     final DateTime selected = await showDatePicker(
         context: context,
         initialDate: _dateTime,
-        firstDate: DateTime(1945,1,1),
-        lastDate: DateTime(2019,12,31)
-    );
+        firstDate: DateTime(1945, 1, 1),
+        lastDate: DateTime(2019, 12, 31));
 
     if (selected != null)
       setState(() {
@@ -128,9 +130,11 @@ class _EditProfileState extends State<EditProfile> {
         decoration: InputDecoration(
           labelText: "Enter new $text",
         ),
-        validator: (String value) {
-          if (value.isEmpty) return "Requires at least one character";
-          else return null;
+        validator: (value) {
+          if (value.length < 1)
+            return "Requies at least one character";
+          else
+            return null;
         },
       ),
     );
@@ -141,14 +145,8 @@ class _EditProfileState extends State<EditProfile> {
         onPressed: validateAndSubmit,
         child: Text(
           "Update profile information",
-          style: TextStyle(
-            color: Theme.of(context).textSelectionColor
-          ),
+          style: TextStyle(color: Theme.of(context).textSelectionColor),
         ),
-        shape:
-        OutlineInputBorder(borderRadius: BorderRadius.circular(13.0))
-    );
+        shape: OutlineInputBorder(borderRadius: BorderRadius.circular(13.0)));
   }
-
-
 }

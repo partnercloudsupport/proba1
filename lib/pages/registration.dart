@@ -135,9 +135,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
            .then((_user) {
              widget.user.email = _user.email;
              widget.user.uid = _user.uid;
-             widget.user.photoUrl = _user.photoUrl ?? "";
              widget.user.birthDate = _dateFormat;
-             print("DATE FORMAT: ${_dateTime.month}/${_dateTime.day}/${_dateTime.year}");
+             widget.user.totalChallenges = 0;
+             widget.user.photoUrl = "https://firebasestorage.googleapis"
+                 ".com/v0/b/challenger-a013b.appspot.com/o/default_picture"
+                 ".png?alt=media&token=47719ef9-688a-43e3-8d0c-1da2ddfb5af8";
          UserManagement().addNewUser(widget.user);
        })
            .then((value) {

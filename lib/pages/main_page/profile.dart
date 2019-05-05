@@ -13,7 +13,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
 
-  var image = "lib/images/default_picture.png";
   File newProfileImage;
   bool _picFlag = false;
 
@@ -30,11 +29,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: <Widget>[
                       Row(
                           children: <Widget>[
-                            _picFlag ? _progressIndicator : getImage(image),
+                            _picFlag ? _progressIndicator : getImage(model.photoUrl),
                             showUser(model),
                           ]
                       ),
-                      changePicButton(),
+                      //changePicButton(model.photoUrl),
                       Container(
                           alignment: Alignment.bottomRight,
                           padding: EdgeInsets.only(right: 8.0),
@@ -44,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       showUserInfo("${model.firstName} ${model.lastName}", Icons.account_circle),
                       showUserInfo("${model.birthDate}", Icons.date_range),
                       showUserInfo("${model.email}", Icons.email),
-                      showUserInfo("Total number of challenges", Icons.assignment_turned_in)
+                      showUserInfo("Number of challenges posted: ${model.totalChallenges}", Icons.assignment_turned_in)
                     ],
                   ),
                 ),
@@ -79,7 +78,7 @@ void imageDoneUpload () {
     );
   }
 
-  uploadImage () async {
+  /*uploadImage (String photoUrl) async {
     var tempImage = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       newProfileImage = tempImage;
@@ -90,15 +89,15 @@ void imageDoneUpload () {
       FirebaseAuth.instance.currentUser()
           .then((user) {
         final StorageReference _fireBaseStorageRef = FirebaseStorage.instance.ref().child(
-            "Profile_pictures/${user.uid.toString()}.jpg");
+            "Profile_pictures/${user.uid.toString()}");
 
         StorageUploadTask task = _fireBaseStorageRef.putFile(newProfileImage);
 
         task.onComplete
-            .then((value) {
-          UserManagement().updateProfileImage(value.toString());
+            .then((value) async {
+          await UserManagement().updateProfileImage(value.toString());
           setState(() {
-            image = user.photoUrl;
+            photoUrl = user.photoUrl;
           });
           imageDoneUpload();
         })
@@ -113,21 +112,21 @@ void imageDoneUpload () {
           });
 
     }
-  }
+  }*/
 
-  Widget changePicButton () {
+  /*Widget changePicButton (String photoUrl) {
     return Container(
       alignment: Alignment.topLeft,
       child: FlatButton(
-          onPressed: uploadImage,
+          onPressed: uploadImage(photoUrl),
           child: Icon(Icons.edit),
       ),
     );
-  }
+  }*/
 
   Widget getImage (String imageUrl) {
-    AssetImage assetImage = AssetImage(imageUrl);
-    Image image = Image(image: assetImage, height: 140.0, width: 140.0,fit: BoxFit.fill);
+    /*AssetImage assetImage = AssetImage(model.photoUrl);*/
+    Image image = Image.network(imageUrl, height: 140.0, width: 140.0,fit: BoxFit.fill);
     return  Padding(
         padding: EdgeInsets.only(top:8.0, left: 14.0, bottom: 8.0),
         child: CircleAvatar(
@@ -173,17 +172,5 @@ void imageDoneUpload () {
               ),
           ],
       );
-  }
-
-  Widget userRating() {
-    return Padding(
-      padding: EdgeInsets.only(right: 8.0),
-      child: Row(
-              children: <Widget>[
-                  Text("Total number of challenges"),
-                  Icon(Icons.assignment_turned_in,size: 40.0,),
-              ]
-      ),
-    );
   }
 }
