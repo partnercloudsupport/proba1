@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,6 +8,8 @@ class OpenForFirstTime extends StatefulWidget {
 }
 
 class _OpenForFirstTimeState extends State<OpenForFirstTime> {
+
+  //POKRECE SE SAMO PRVI PUT KAD SE PALI APP...
   
   PageController _pageController;
   
@@ -19,7 +22,7 @@ class _OpenForFirstTimeState extends State<OpenForFirstTime> {
           pageOne(),
           pageTwo(),
           pageThree(),
-          pageFour()
+          pageFour(context)
         ],
       ),
     );
@@ -28,33 +31,28 @@ class _OpenForFirstTimeState extends State<OpenForFirstTime> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 1);
+    _pageController = PageController(initialPage: 0);
+    Timer(Duration(milliseconds: 200), () {
+      _checkIfSeen();
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
-    _incrementStartupNumber();
     super.dispose();
   }
 
-  Future<int> _getTotalStartupNumber () async {
+  Future _checkIfSeen () async {
     final prefs = await SharedPreferences.getInstance();
-    final startupNumber = prefs.getInt('startupNumber');
+    final _seen = (prefs.getBool('seen') ?? false);
 
-    if (startupNumber == null) return 0;
-    else return startupNumber;
-  }
-
-  Future<void> _incrementStartupNumber () async {
-    final prefs = await SharedPreferences.getInstance();
-
-    int lasStartupNumber = await _getTotalStartupNumber();
-    int currentStartupNumber = ++lasStartupNumber;
-
-    await prefs.setInt('startupNumber', currentStartupNumber);
-
-    //TODO proveriti koliko puta se aplikacija upalila i prebaciti na odredjeni page
+    if (_seen) {Navigator.of(context).pushReplacementNamed("/main_page");}
+    else {
+      prefs.setBool('seen', true);
+      //Navigator.of(context).pushReplacement(
+        //  new MaterialPageRoute(builder: (context) => new IntroScreen()));
+    }
   }
 
   Widget pageOne () {
@@ -109,7 +107,7 @@ class _OpenForFirstTimeState extends State<OpenForFirstTime> {
     );
   }
 
-  Widget pageFour() {
+  Widget pageFour(BuildContext context) {
     return Center(
         child: SingleChildScrollView(
           child: Column(
@@ -125,7 +123,11 @@ class _OpenForFirstTimeState extends State<OpenForFirstTime> {
                   "Also you can edit your profile at any time by clicking on the ${Icon(Icons.settings)}"),
               SizedBox(height: 20.0),
               RaisedButton(
-                  onPressed: null
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("Let's start"),
+                  color: Theme.of(context).primaryColor,
+                  shape: CircleBorder(side: BorderSide(style: BorderStyle.solid)),
+                  onPressed: () {Navigator.of(context).pushReplacementNamed("/main_page");}
               )
             ],
           ),
