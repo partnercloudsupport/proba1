@@ -53,7 +53,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                 controller: _tabController,
                 children: <Widget>[
                   add.AddChallenge(challengeDetails: NewChallenge(),),
-                  feed.Feed(storage: AllChallengesStorage(),),
+                  feed.Feed(challengesInfo: AllChallengesStorage(),),
                   profile.ProfileScreen()
                 ]
             ),
