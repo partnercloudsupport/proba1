@@ -27,17 +27,17 @@ class NewChallenge {
           .where("uid", isEqualTo: user.uid)
           .getDocuments()
           .then((docs) {
+        var tempOutput = new List<dynamic>.from(docs.documents[0].data["challenges"]);
+        tempOutput.add({
+          'name': details.name,
+          'description': details.description,
+          'duration': details.duration,
+          //'image' : imageUrl
+        });
         Firestore.instance
             .document("Users/${docs.documents[0].documentID}")
             .setData({
-          'challenges': [
-            {
-              'name': details.name,
-              'description': details.description,
-              'duration': details.duration,
-              //'image' : imageUrl
-            }
-          ]
+          'challenges': tempOutput
         }, merge: true);
       }).then((_) {
         print("USPELO!!!");
