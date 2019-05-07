@@ -35,6 +35,7 @@ class UserManagement extends Model with NewChallenge {
       'username': user.username,
       'photo_url': user.photoUrl,
       'birth_date': user.birthDate,
+      'total_challenges' : user.totalChallenges,
       'challenges': [
         {'name': "", 'description': "", 'duration': "", 'image': ""}
       ]
@@ -44,7 +45,7 @@ class UserManagement extends Model with NewChallenge {
   }
 
   //upis url-a nove slike u bazu trenutnog usera
-  Future updateProfileImage(String picUrl) {
+  updateProfileImage(String picUrl) {
     var userInfo = UserUpdateInfo();
     userInfo.photoUrl = picUrl;
 
@@ -90,6 +91,7 @@ class UserManagement extends Model with NewChallenge {
           model.email = userData["email"];
           model.birthDate = userData["birth_date"];
           model.uid = userData["uid"];
+          model.photoUrl = userData["photo_url"];
           model.totalChallenges = userData["total_challenges"];
           notifyListeners();
         }
@@ -101,7 +103,7 @@ class UserManagement extends Model with NewChallenge {
     });
   }
 
-  Future updateUserInfo(String firstName, String lastName, String birth) async {
+  updateUserInfo(String firstName, String lastName, String birth) async {
 
     await FirebaseAuth.instance.currentUser().then((user) {
       Firestore.instance

@@ -7,6 +7,7 @@ import 'package:proba/services/userManagement.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/all_challenges_storage.dart';
 import 'package:proba/services/new_challenge.dart';
+import 'package:proba/services/current_user_challenges.dart';
 
 class MainScreen extends StatefulWidget {
 
@@ -54,7 +55,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                 children: <Widget>[
                   add.AddChallenge(challengeDetails: NewChallenge(),),
                   feed.Feed(challengesInfo: AllChallengesStorage(),),
-                  profile.ProfileScreen()
+                  profile.ProfileScreen(challengesInfo: UserChallenges(),)
                 ]
             ),
       ),

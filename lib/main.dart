@@ -25,7 +25,7 @@ class Challenger extends StatelessWidget {
           routes: <String, WidgetBuilder> {
             "/login" : (BuildContext context) => LoginPage(),
             "/registration" : (BuildContext context) => RegistrationPage(user: UserManagement(),),
-            "/main_page" : (BuildContext context) => MainScreen(user: UserManagement()),
+            "/main_page" : (BuildContext context) => MainScreen(user: UserManagement(),),
             "/edit_profile" : (BuildContext context) => EditProfile(),
             "/open_first_time" : (BuildContext context) => OpenForFirstTime()
           }

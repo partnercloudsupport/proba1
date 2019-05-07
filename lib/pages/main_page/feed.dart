@@ -22,10 +22,11 @@ class _FeedState extends State<Feed> {
       body: FutureBuilder<List<AllChallengesStorage>>(
         future: challengesToFeed(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (!snapshot.hasData) return Center(child: Text("Loading..."));
           return ListView.builder(
             itemCount: snapshot.data.length,
-            itemBuilder: (context, index) {
-              _cardBuilder(context, snapshot, index);
+            itemBuilder: (BuildContext context, int index) {
+              _cardBuilder(snapshot, index);
             },
           );
         },
@@ -39,12 +40,18 @@ class _FeedState extends State<Feed> {
         .where("challenges", isGreaterThanOrEqualTo: 1)
         .getDocuments();
     if (queryResult.documents.isNotEmpty){
+      print(queryResult.documents.length);
       for (int i=0; i < queryResult.documents.length; ++i){
         for (int j=0; j < queryResult.documents[i].data['total_challenges']; ++j){
           widget.challengesInfo.username = queryResult.documents[i].data['username'];
+          print(widget.challengesInfo.username);
           widget.challengesInfo.name = queryResult.documents[i].data['challenges'][j]['name'];
+          print(widget.challengesInfo.name);
           widget.challengesInfo.description = queryResult.documents[i].data['challenges'][j]['description'];
+          print(widget.challengesInfo.description);
           widget.challengesInfo.duration = queryResult.documents[i].data['challenges'][j]['duration'];
+          print(widget.challengesInfo.duration);
+          print("------------------------------------------");
 
           allChallenges.add(widget.challengesInfo);
         }
@@ -54,7 +61,7 @@ class _FeedState extends State<Feed> {
     return allChallenges;
   }
 
-  Widget _cardBuilder (BuildContext context, AsyncSnapshot snapshot, int index) {
+  Widget _cardBuilder (AsyncSnapshot snapshot, int index) {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: Card(
