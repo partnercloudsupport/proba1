@@ -41,6 +41,8 @@ class _FeedState extends State<Feed> {
         .getDocuments();
     if (queryResult.documents.isNotEmpty){
       print(queryResult.documents.length);
+      //ULAZI U PRVU DOKUMENT I KUPI SVE NJEGOVE CHALLENGE, PA U DRUGI ITD, SVI PODACI JEDNOG
+      //CHALLENGA SE UPISUJU U KONSTRUKTOR
       for (int i=0; i < queryResult.documents.length; ++i){
         for (int j=0; j < queryResult.documents[i].data['total_challenges']; ++j){
           widget.challengesInfo.username = queryResult.documents[i].data['username'];
@@ -52,7 +54,7 @@ class _FeedState extends State<Feed> {
           widget.challengesInfo.duration = queryResult.documents[i].data['challenges'][j]['duration'];
           print(widget.challengesInfo.duration);
           print("------------------------------------------");
-
+          //PRAZNA LISTA KONSTRUKTORA, OVDE SE UPISUJU SVI CHALLENGE JEDAN ZA DRUGIM
           allChallenges.add(widget.challengesInfo);
         }
       }

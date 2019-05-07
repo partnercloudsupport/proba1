@@ -42,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       alignment: Alignment.bottomRight,
                       padding: EdgeInsets.only(right: 8.0),
                       child: Text("User info")),
-                  Divider(color: Theme.of(context).primaryColor, indent: 0.0),
+                  Divider(color: Theme.of(context).primaryColor, indent: 80.0),
                   showUserInfo("${model.firstName} ${model.lastName}",
                       Icons.account_circle),
                   showUserInfo("${model.birthDate}", Icons.date_range),
