@@ -144,7 +144,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
        })
            .then((value) {
              _signedIn();
-             Navigator.of(context).pushReplacementNamed("/open_first_time");
+             Navigator.of(context).pushReplacementNamed("/main_page");
            })
            .catchError((e) {
          _showSnackBar(e.toString());

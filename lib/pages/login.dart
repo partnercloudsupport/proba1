@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
             password: _password.text)
           .then((_user) {
             _loggedIn();
-            Navigator.of(context).pushNamed("/open_first_time");
+            Navigator.of(context).pushNamed("/main_page");
           })
           .catchError((e) {
         _showSnackBar(e.toString());
