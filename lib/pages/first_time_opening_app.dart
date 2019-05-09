@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:page_indicator/page_indicator.dart';
 
 class OpenForFirstTime extends StatefulWidget {
@@ -19,7 +17,7 @@ class _OpenForFirstTimeState extends State<OpenForFirstTime> {
       body: Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(
-                colors: [Color(0xFFE8290B), Color(0xFFEA7773)],
+                colors: [Color(0xFFA60000), Color(0xFFEAF0F1)],
                 begin: FractionalOffset.topLeft,
                 end: FractionalOffset.bottomRight,
                 stops: [0.0, 1.0],
@@ -50,9 +48,6 @@ class _OpenForFirstTimeState extends State<OpenForFirstTime> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
- //   Timer(Duration(milliseconds: 100), () {
-   //   _checkIfSeen();
-  //  });
   }
 
   @override
@@ -60,17 +55,6 @@ class _OpenForFirstTimeState extends State<OpenForFirstTime> {
     _pageController.dispose();
     super.dispose();
   }
-
-  /*Future _checkIfSeen() async {
-    final prefs = await SharedPreferences.getInstance();
-    final _seen = (prefs.getBool('seen') ?? false);
-
-    if (_seen) {
-      Navigator.of(context).pushReplacementNamed("/main_page");
-    } else {
-      prefs.setBool('seen', true);
-    }
-  }*/
 
   Widget pageOne() {
     return Center(
@@ -151,7 +135,7 @@ class _OpenForFirstTimeState extends State<OpenForFirstTime> {
               color: Theme.of(context).primaryColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed("/main_page");
+                Navigator.of(context).pushReplacementNamed("/login");
               })
         ],
       ),

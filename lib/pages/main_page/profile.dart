@@ -23,39 +23,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _picFlag = false;
   List<UserChallenges> challenges = [];
 
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<UserManagement>(
-        builder: (BuildContext context, Widget child, UserManagement model) {
-      return Scaffold(
-        body: Center(
-          child: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                children: <Widget>[
-                  Row(children: <Widget>[
-                    _picFlag ? _progressIndicator : getImage(model.photoUrl),
-                    showUser(model),
-                  ]),
-                  //changePicButton(model.photoUrl),
-                  Container(
-                      alignment: Alignment.bottomRight,
-                      padding: EdgeInsets.only(right: 8.0),
-                      child: Text("User info")),
-                  Divider(color: Theme.of(context).primaryColor, indent: 80.0),
-                  showUserInfo("${model.firstName} ${model.lastName}",
-                      Icons.account_circle),
-                  showUserInfo("${model.birthDate}", Icons.date_range),
-                  showUserInfo("${model.email}", Icons.email),
-                  //showUserInfo("${model.totalChallenges}", Icons.assignment_turned_in),
-                  challengeHistory(model.totalChallenges, Icons.assignment_turned_in)
-                ],
+          builder: (BuildContext context, Widget child, UserManagement model) {
+        return Scaffold(
+          body: Center(
+            child: SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  children: <Widget>[
+                    Row(children: <Widget>[
+                      _picFlag ? _progressIndicator : getImage(model.photoUrl),
+                      showUser(model),
+                    ]),
+                    //changePicButton(model.photoUrl),
+                    Container(
+                        alignment: Alignment.bottomRight,
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Text("User info")),
+                    Divider(color: Theme.of(context).primaryColor, indent: 80.0),
+                    showUserInfo("${model.firstName} ${model.lastName}",
+                        Icons.account_circle),
+                    showUserInfo("${model.birthDate}", Icons.date_range),
+                    showUserInfo("${model.email}", Icons.email),
+                    //showUserInfo("${model.totalChallenges}", Icons.assignment_turned_in),
+                    challengeHistory(model.totalChallenges, Icons.assignment_turned_in)
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        );}
       );
-    });
   }
 
   void imageIsUploading() {
@@ -199,31 +200,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget challengeHistory(int totalChallenges, IconData icon) {
-    return ExpansionTile(
-      title: Text("Total number of challenges posted: $totalChallenges"),
-      trailing: Icon(Icons.keyboard_arrow_down),
-      leading: Icon(icon),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        FutureBuilder<List<UserChallenges>>(
-          future: currentUserChallenges(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (!snapshot.hasData)
-              return Center(
-                child: Text("Loading..."),
-              );
-            return ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: snapshot.data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Text(snapshot.data[index].challengeName),
-                    trailing: Text(snapshot.data[index].challengeDuration),
-                    subtitle: Text(snapshot.data[index].challengeDesc),
-                  );
-                });
-          },
-        )
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: ExpansionTile(
+            title: Text("Total number of challenges posted: $totalChallenges"),
+            trailing: Icon(Icons.keyboard_arrow_down),
+            leading: Icon(icon),
+            children: <Widget>[
+              FutureBuilder<List<UserChallenges>>(
+                future: currentUserChallenges(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (!snapshot.hasData)
+                    return Center(
+                      child: Text("Loading..."),
+                    );
+                  return ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          title: Text(snapshot.data[index].challengeName),
+                          trailing: Text(snapshot.data[index].challengeDuration),
+                          subtitle: Text(snapshot.data[index].challengeDesc),
+                        );
+                      });
+                },
+              )
+            ],
+          ),
+        ),
       ],
     );
   }

@@ -82,6 +82,7 @@ class _LoginPageState extends State<LoginPage> {
             email: _email.text,
             password: _password.text)
           .then((_user) {
+            _formKey.currentState.reset();
             _loggedIn();
             Navigator.of(context).pushNamed("/main_page");
           })
@@ -131,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
     return FlatButton(
       onPressed: () {
         Navigator.of(context).pushNamed("/registration");
+        _formKey.currentState.reset();
       },
       child: Text("Don't have an account? Create new!",
         style: TextStyle(
@@ -169,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
               textFormField("password"),
               _loading ? _progressIndicator() : loginButton(),
               regButton(),
-              SizedBox(height: 40.0)
+              SizedBox(height: 20.0)
             ]
         ),
       ),

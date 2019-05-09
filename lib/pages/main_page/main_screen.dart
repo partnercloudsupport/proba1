@@ -26,6 +26,19 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 
 
   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     //Upisuje podatke trenutnog usera u Scope Model
     UserManagement().addToModel(widget.user);
@@ -61,20 +74,6 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
       ),
     );
   }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
 
   List<Tab> buildTabs () {
     return [

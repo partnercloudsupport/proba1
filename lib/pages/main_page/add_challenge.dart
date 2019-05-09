@@ -23,11 +23,13 @@ class _AddChallengeState extends State<AddChallenge> {
   File _image;
   double _minPadding = 12.0;
   var _fKey = GlobalKey<FormState>();
+  var sKey = GlobalKey<ScaffoldState>();
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: sKey,
       body: Form(
         key: _fKey,
         child: ListView(
@@ -94,8 +96,22 @@ class _AddChallengeState extends State<AddChallenge> {
       //widget.user.image = _image;
       //String url = await uploadImage(widget.user.image);
 
-      await NewChallenge().addNewChallenge(widget.challengeDetails, /*url*/);
+      await NewChallenge().addNewChallenge(widget.challengeDetails, /*url*/)
+          .then((_) {
+        _fKey.currentState.reset();
+        _showSnackBar("Challenge posted!");
+      });
+
     }
+  }
+
+  _showSnackBar (String text) {
+    sKey.currentState.showSnackBar(
+        SnackBar(
+            duration: Duration(seconds: 4),
+            content: Text(text)
+        )
+    );
   }
 
 

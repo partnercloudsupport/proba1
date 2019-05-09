@@ -17,11 +17,8 @@ class NewChallenge {
   }
 
   //dodaje novi challenge u bazu trenutnog usera
-  addNewChallenge(
-      NewChallenge details,
-      /*String imageUrl*/
-      ) {
-    FirebaseAuth.instance.currentUser().then((user) {
+  addNewChallenge (NewChallenge details, /*String imageUrl*/) async {
+    await FirebaseAuth.instance.currentUser().then((user) {
       Firestore.instance
           .collection("Users")
           .where("uid", isEqualTo: user.uid)

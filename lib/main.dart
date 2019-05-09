@@ -45,8 +45,10 @@ class _ChallengerState extends State<Challenger> {
     return MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-              primaryColor: Color(0xFFE8290B),
-              buttonColor: Colors.red,
+              primaryColor: Color(0xFFB83227),
+              buttonColor: Color(0xFFA60000),
+              splashColor: Color(0xFFEAF0F1),
+              accentColor: Color(0xFFFF4848),
               textSelectionColor: Colors.white
           ),
           title: "Challenger",

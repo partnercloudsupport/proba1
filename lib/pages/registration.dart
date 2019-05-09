@@ -28,6 +28,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
+        _formKey.currentState.reset();
         Navigator.of(context).pop();
       },
       child: Scaffold(
@@ -38,6 +39,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
+              _formKey.currentState.reset();
               Navigator.of(context).pop();
             },
           ),

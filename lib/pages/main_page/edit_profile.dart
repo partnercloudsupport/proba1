@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proba/services/userManagement.dart';
 import 'dart:io';
+import 'package:scoped_model/scoped_model.dart';
 
 class EditProfile extends StatefulWidget {
   @override
@@ -19,46 +20,45 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-        return WillPopScope(
-            onWillPop: () {
-              Navigator.of(context).pop();
-            },
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  "Go back",
-                  textAlign: TextAlign.left,
-                ),
-                elevation: 0.0,
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-              key: _key,
-              body: Center(
-                child: SingleChildScrollView(
-                  child: Center(
-                    child: Form(
-                      key: _globalKey,
-                      child: Column(
-                        children: <Widget>[
-                          newInfo("first name"),
-                          newInfo("last name"),
-                          showBirthDate(context),
-                          updateButton(context)
-                        ],
-                      ),
-                    ),
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.of(context).pop();
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              "Go back",
+              textAlign: TextAlign.left,
+            ),
+            elevation: 0.0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+          key: _key,
+          body: Center(
+            child: SingleChildScrollView(
+              child: Center(
+                child: Form(
+                  key: _globalKey,
+                  child: Column(
+                    children: <Widget>[
+                      newInfo("first name"),
+                      newInfo("last name"),
+                      showBirthDate(context),
+                      updateButton(context)
+                    ],
                   ),
                 ),
               ),
-            )
-        );
-      }
-
+            ),
+          ),
+      ),
+    );
+  }
 
   _showSnackBar(String text) {
     _key.currentState.showSnackBar(

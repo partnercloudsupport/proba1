@@ -81,7 +81,7 @@ class UserManagement extends Model with NewChallenge {
           .collection("Users")
           .where("uid", isEqualTo: _currentUser.uid)
           .getDocuments()
-          .then((QuerySnapshot docs) {
+          .then((QuerySnapshot docs) async {
         if (docs.documents.isNotEmpty) {
           var userData;
           userData = docs.documents[0].data;
@@ -91,7 +91,7 @@ class UserManagement extends Model with NewChallenge {
           model.email = userData["email"];
           model.birthDate = userData["birth_date"];
           model.uid = userData["uid"];
-          model.photoUrl = userData["photo_url"];
+          model.photoUrl = await userData["photo_url"];
           model.totalChallenges = userData["total_challenges"];
           notifyListeners();
         }
